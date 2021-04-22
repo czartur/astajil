@@ -146,7 +146,7 @@ void linkar(alu** headAlu, dis** headDis){
 }
 
 
-void removeDisciplina(int codigo, dis** head, alu** headAlu){
+void removeDisciplina(int codigo, dis** head){
     dis *p = *head, *prev=NULL; 
     while(p && p->codigo != codigo){
         prev=p; 
@@ -154,9 +154,6 @@ void removeDisciplina(int codigo, dis** head, alu** headAlu){
     }
     if(p == NULL) return;
     (prev == NULL) ? *head=p->next : prev->next=p->next;
-
-    //passar em cada aluno para deslinkar
-
 }
 void removeAluno(int codigo, alu** head){
     alu *p = *head, *prev=NULL;
@@ -218,7 +215,10 @@ void saveData(FILE **ptr, float per, alu** headAlu, dis** headDis){
     for(alu* p = *headAlu; p!=NULL; p=p->next){
         fprintf(*ptr, "A\n%d\n%s\n%s\n", p->codigo, p->nome, p->cpf);
         dis* aux = p->disciplinas;
-        while(aux!=NULL) fprintf(*ptr, "%d ", aux->codigo);
+        while(aux!=NULL){
+            fprintf(*ptr, "%d ", aux->codigo);
+            aux=aux->next;
+        }
         fprintf(*ptr, "0\n\n");
     }
     fclose(*ptr);
@@ -302,7 +302,9 @@ int menuCadastros(alu **headAlu, dis **headDis){
         case 5:
             printf("Código?(ex 4123): ");
             scanf("%d", &codigo);
-            removeDisciplina(codigo, headDis, headAlu);
+            removeDisciplina(codigo, headDis);
+            for(alu* p=*headAlu; p!=NULL; p=p->next)
+                removeDisciplina(codigo, &(p->disciplinas));
             break;
     }
     return ans;
