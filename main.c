@@ -142,6 +142,7 @@ void linkar(alu** headAlu, dis** headDis){
     }
     dis* nova = (dis*) malloc(sizeof(dis));
     *nova = *auxDis;
+    nova->next = NULL;
     insereDisciplina(nova, &(auxAlu->disciplinas));
 }
 
@@ -196,7 +197,9 @@ void loadData(FILE **ptr, float per, alu** headAlu, dis** headDis){
             int codigoDis; 
             while(fscanf(*ptr, "%d", &codigoDis)){
                 if(codigoDis == 0) break;
-                dis* nova = encontraDisciplina(codigoDis, *headDis);
+                dis* nova = (dis*) malloc(sizeof(dis));
+                *nova=*encontraDisciplina(codigoDis, *headDis);
+                nova->next = NULL;
                 insereDisciplina(nova, &(novo->disciplinas));
                 //printf("%d ", codigoDis);
             }
