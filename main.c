@@ -21,6 +21,13 @@ struct Aluno {
     struct Aluno* next;
 };
 
+void wait(){
+    printf("press anything to continue...");
+    fflush(stdin);
+    fgetc(stdin);
+    getchar();
+}
+
 
 dis* novaDisciplina(){
     dis* nova = (dis*) malloc(sizeof(dis));
@@ -42,14 +49,14 @@ void insereDisciplina(dis* nova, dis** head){
 void printaDisciplinas(dis* head){
     printf("#Disciplinas\n");
     for(dis *p=head; p!=NULL; p=p->next)
-        printf("%d | %s | %s\n", p->codigo, p->nome, p->professor);
+        printf("%d | %s\n", p->codigo, p->nome);
 }
 dis* encontraDisciplina(int codigo, dis* head){
     dis* p = head;
     while(p && p->codigo != codigo) p=p->next;
     return p;
 }
-void verDisciplina(dis* head){
+void verDisciplina(dis* head, alu* headAlu){
     int codigo;
     printf("Código?(ex 1432): ");
     scanf("%d", &codigo);
@@ -61,6 +68,13 @@ void verDisciplina(dis* head){
     printf("Nome: %s\n", aux->nome);
     printf("Professor: %s\n", aux->professor);
     printf("Créditos: %d\n", aux->creditos);
+    printf("Alunos: \n");
+    int cnt=0;
+    for(alu* p = headAlu; p!=NULL; p=p->next){
+        dis* aux=p->disciplinas;
+        if(encontraDisciplina(codigo, aux))
+            printf("(%d) %s\n", ++cnt, p->nome);
+    }
 }
 
 alu* novoAluno(){
@@ -106,12 +120,6 @@ void verAluno(alu* head, dis* headDis){
     int cnt=0;
     for(dis* p = aux->disciplinas; p!=NULL; p=p->next)
         printf("(%d) %s\n", ++cnt, p->nome);
-    /*
-    for(int i=1; i<=(aux->qtd); i++){
-        dis* auxDis = encontraDisciplina((aux->disciplinas)[i-1], headDis);
-        printf("(%d) %s\n", i, auxDis->nome); 
-    } 
-    */
 }
 
 
@@ -163,49 +171,76 @@ void removeAluno(int codigo, alu** head){
 char* perString(float per){
     char *ans = (char*) malloc(7*sizeof(char));
     int eval = (int)10*per;
-    ans[0]=eval%10 + '0'; eval/=10;
-    ans[1]='.';
-    for(int i=2; i<6; i++) {ans[i] = eval%10 + '0'; eval/=10;}
+    ans[5]=eval%10 + '0'; eval/=10;
+    ans[4]='.';
+    for(int i=3; i>=0; i--) {ans[i] = eval%10 + '0'; eval/=10;}
     ans[6]='\0';
-    return ans; 
+    return ans;
 }
+
 void loadData(FILE **ptr, float per, alu** headAlu, dis** headDis){
     *ptr = fopen(perString(per), "r");
+    if(*ptr == NULL) return;
     char tipo;
-    while(fscanf(*ptr, " %c", &tipo) !=EOF){
+    while(fscanf(*ptr, " %c", &tipo) != EOF){
         if(tipo == 'D'){
             dis* nova = (dis*) malloc(sizeof(dis));
             nova->next = NULL;
             fscanf(*ptr, "%d %s %s %d", &(nova->codigo), nova->nome, nova->professor, &(nova->creditos));
+            //printf("\n%d\n%s\n%s\n%d\n\n", nova->codigo, nova->nome, nova->professor, nova->creditos);
+            insereDisciplina(nova, headDis);
+        }
+        if(tipo == 'A'){
+            alu* novo = (alu*) malloc(sizeof(alu));
+            novo->next = NULL;
+            novo->disciplinas = NULL;
+            fscanf(*ptr, "%d %s %s", &(novo->codigo), novo->nome, novo->cpf);
+            //printf("\n%d\n%s\n%s\n", novo->codigo, novo->nome, novo->cpf);
+            int codigoDis; 
+            while(fscanf(*ptr, "%d", &codigoDis)){
+                if(codigoDis == 0) break;
+                dis* nova = encontraDisciplina(codigoDis, *headDis);
+                insereDisciplina(nova, &(novo->disciplinas));
+                //printf("%d ", codigoDis);
+            }
+            //printf("0\n\n");
+            insereAluno(novo, headAlu);
         }
     }
+    //wait();
+    fclose(*ptr);
 }
-
+void saveData(FILE **ptr, float per, alu** headAlu, dis** headDis){
+    *ptr = fopen(perString(per), "w+");
+    for(dis* p = *headDis; p!=NULL; p=p->next){
+        fprintf(*ptr, "D\n%d\n%s\n%s\n%d\n\n", p->codigo, p->nome, p->professor, p->creditos);
+    }
+    for(alu* p = *headAlu; p!=NULL; p=p->next){
+        fprintf(*ptr, "A\n%d\n%s\n%s\n", p->codigo, p->nome, p->cpf);
+        dis* aux = p->disciplinas;
+        while(aux!=NULL) fprintf(*ptr, "%d ", aux->codigo);
+        fprintf(*ptr, "0\n\n");
+    }
+    fclose(*ptr);
+}
 
 int menuPrincipal();
 int menuCadastros(alu**, dis**);
 int menuConsultas(alu**, dis**);
 
-void wait(){
-    printf("press anything to continue...");
-    fflush(stdin);
-    fgetc(stdin);
-    getchar();
-}
-
 int main(){
-    FILE *ptr;
-    alu* headAlu = NULL;
-    dis* headDis = NULL;
     while(true){
+        FILE *ptr;
+        alu* headAlu = NULL;
+        dis* headDis = NULL;
         int level=0;
         system("clear");
-        printf("Carregar Período (ex 2021.1) // 0 para sair\n");
+        printf("Carregar Período (ex 2021.1)\n[0] para sair\n");
         float per;
         scanf("%f", &per);
         if(per==0) break;
         
-        //loadData(&ptr, per, &headAlu, &headDis);
+        loadData(&ptr, per, &headAlu, &headDis);
 
         level++;
         while(level>0){
@@ -217,7 +252,7 @@ int main(){
                 while(menuConsultas(&headAlu, &headDis));
                 break;
             case 3:
-                //save data
+                saveData(&ptr, per, &headAlu, &headDis);
                 break;
             default:
                 level--;
@@ -283,7 +318,7 @@ int menuConsultas(alu **headAlu, dis **headDis){
     scanf("%d", &ans);
     switch(ans){
         case 1:
-            verDisciplina(*headDis);
+            verDisciplina(*headDis, *headAlu);
             printf("\n");
             break;
         case 2:
@@ -300,22 +335,3 @@ int menuConsultas(alu **headAlu, dis **headDis){
     if(ans) wait();
     return ans;
 }
-
-//período (data base archive)
-//Disciplinas nos alunos
- 
-//Main MENU
-//0. Escolha um período >>
-
-//1. Cadastros
-//1.1 Inserir Aluno
-//1.2 Inserir Disciplina
-//1.3 Linkar Aluno e Disciplina
-
-//2. Consultas
-//2.1 Ver disciplina
-//2.2 Ver aluno
-//2.3 List ALL  
-
-//3. Wipe data
-
