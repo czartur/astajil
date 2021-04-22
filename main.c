@@ -14,12 +14,9 @@ struct Disciplina {
 };
 struct Aluno {
     int codigo;
-    char nome[20];
-    ll cpf;
+    char nome[20], cpf[20];
     
-    int* disciplinas;
-    int qtd;
-    struct Disciplina;
+    struct Disciplina* disciplinas;  
 
     struct Aluno* next;
 };
@@ -70,14 +67,13 @@ alu* novoAluno(){
     alu* ans = (alu*) malloc(sizeof(alu));
     ans->next = NULL;
     ans->disciplinas = NULL;
-    ans->qtd = 0;
     
     printf("Código (ex 19401): ");
     scanf("%d", &(ans->codigo));
     printf("Nome (ex Almeida): ");
     scanf("%s", ans->nome);
     printf("CPF (ex 09876543211): ");
-    scanf("%lld", &(ans->cpf));
+    scanf("%s", ans->cpf);
     
     return ans;
 }
@@ -105,12 +101,17 @@ void verAluno(alu* head, dis* headDis){
         return;
     }
     printf("Nome: %s\n", aux->nome);
-    printf("CPF: %lld\n", aux->cpf);
+    printf("CPF: %s\n", aux->cpf);
     printf("Disciplinas: \n");
+    int cnt=0;
+    for(dis* p = aux->disciplinas; p!=NULL; p=p->next)
+        printf("(%d) %s\n", ++cnt, p->nome);
+    /*
     for(int i=1; i<=(aux->qtd); i++){
         dis* auxDis = encontraDisciplina((aux->disciplinas)[i-1], headDis);
         printf("(%d) %s\n", i, auxDis->nome); 
-    }
+    } 
+    */
 }
 
 
@@ -131,9 +132,9 @@ void linkar(alu** headAlu, dis** headDis){
         printf("Disciplina não encontrada!\n");
         return; 
     }
-    (auxAlu->qtd)++;
-    auxAlu->disciplinas = (int*) realloc(auxAlu->disciplinas,(auxAlu->qtd)*sizeof(int));
-    (auxAlu->disciplinas)[(auxAlu->qtd)-1]=codigoDis;
+    dis* nova = (dis*) malloc(sizeof(dis));
+    *nova = *auxDis;
+    insereDisciplina(nova, &(auxAlu->disciplinas));
 }
 
 
@@ -159,6 +160,28 @@ void removeAluno(int codigo, alu** head){
     (prev == NULL) ? *head=p->next : prev->next=p->next;
 }
 
+char* perString(float per){
+    char *ans = (char*) malloc(7*sizeof(char));
+    int eval = (int)10*per;
+    ans[0]=eval%10 + '0'; eval/=10;
+    ans[1]='.';
+    for(int i=2; i<6; i++) {ans[i] = eval%10 + '0'; eval/=10;}
+    ans[6]='\0';
+    return ans; 
+}
+void loadData(FILE **ptr, float per, alu** headAlu, dis** headDis){
+    *ptr = fopen(perString(per), "r");
+    char tipo;
+    while(fscanf(*ptr, " %c", &tipo) !=EOF){
+        if(tipo == 'D'){
+            dis* nova = (dis*) malloc(sizeof(dis));
+            nova->next = NULL;
+            fscanf(*ptr, "%d %s %s %d", &(nova->codigo), nova->nome, nova->professor, &(nova->creditos));
+        }
+    }
+}
+
+
 int menuPrincipal();
 int menuCadastros(alu**, dis**);
 int menuConsultas(alu**, dis**);
@@ -171,7 +194,7 @@ void wait(){
 }
 
 int main(){
-    bool sair=0;
+    FILE *ptr;
     alu* headAlu = NULL;
     dis* headDis = NULL;
     while(true){
@@ -181,8 +204,9 @@ int main(){
         float per;
         scanf("%f", &per);
         if(per==0) break;
+        
+        //loadData(&ptr, per, &headAlu, &headDis);
 
-        //load data
         level++;
         while(level>0){
             switch (menuPrincipal()){
