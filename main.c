@@ -12,6 +12,7 @@ struct Disciplina {
 
     struct Disciplina* next;
 };
+
 struct Aluno {
     int codigo;
     char nome[20], cpf[20];
@@ -22,13 +23,13 @@ struct Aluno {
 };
 
 void wait(){
-    printf("press anything to continue...");
+    printf("press enter to continue...");
     fflush(stdin);
     fgetc(stdin);
     getchar();
 }
 
-
+//Disciplina
 dis* novaDisciplina(){
     dis* nova = (dis*) malloc(sizeof(dis));
     nova->next = NULL;
@@ -77,6 +78,7 @@ void verDisciplina(dis* head, alu* headAlu){
     }
 }
 
+//Aluno
 alu* novoAluno(){
     alu* ans = (alu*) malloc(sizeof(alu));
     ans->next = NULL;
@@ -122,7 +124,7 @@ void verAluno(alu* head, dis* headDis){
         printf("(%d) %s\n", ++cnt, p->nome);
 }
 
-
+//link
 void linkar(alu** headAlu, dis** headDis){
     int codigoAlu, codigoDis;
     printf("Codigo do Aluno? (ex 19006): ");
@@ -146,7 +148,7 @@ void linkar(alu** headAlu, dis** headDis){
     insereDisciplina(nova, &(auxAlu->disciplinas));
 }
 
-
+//remove
 void removeDisciplina(int codigo, dis** head){
     dis *p = *head, *prev=NULL; 
     while(p && p->codigo != codigo){
@@ -176,6 +178,7 @@ char* perString(float per){
     return ans;
 }
 
+//load & save
 void loadData(FILE **ptr, float per, alu** headAlu, dis** headDis){
     *ptr = fopen(perString(per), "r");
     if(*ptr == NULL) return;
