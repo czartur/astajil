@@ -167,6 +167,23 @@ void removeAluno(int codigo, alu** head){
     if(p == NULL) return;
     (prev == NULL) ? *head=p->next : prev->next=p->next;
 }
+void deslinkar(alu** headAlu){
+	int codigoAlu, codigoDis;
+    printf("Codigo do Aluno? (ex 19086): ");
+    scanf("%d", &codigoAlu);
+    alu* auxAlu = encontraAluno(codigoAlu, *headAlu);
+    if(auxAlu == NULL){
+        printf("Aluno não encontrado!\n");
+        return; 
+    }
+    printf("Codigo da Disciplina? (ex 4321): ");
+    scanf("%d", &codigoDis);//falta testar a disciplina
+    if (!(encontraDisciplina(codigoDis,auxAlu->disciplinas))) {
+        printf("Disciplina nao relacionada ao aluno!\n");
+        return;
+    }
+ 	removeDisciplina(codigoDis, &(auxAlu->disciplinas));
+}
 
 char* perString(float per){
     char *ans = (char*) malloc(7*sizeof(char));
@@ -285,8 +302,9 @@ int menuCadastros(alu **headAlu, dis **headDis){
     printf("1. Inserir Aluno\n");
     printf("2. Inserir Disciplina\n");
     printf("3. Linkar Aluno e Disciplina\n");
-    printf("4. Remover Aluno\n");
-    printf("5. Remover Disciplina\n");
+    printf("4. Deslinkar Aluno e Disciplina\n");
+    printf("5. Remover Aluno\n");
+    printf("6. Remover Disciplina\n");
     printf("0. Voltar\n\n");
     scanf("%d", &ans);
 
@@ -300,12 +318,15 @@ int menuCadastros(alu **headAlu, dis **headDis){
         case 3: 
             linkar(headAlu, headDis);
             break;
-        case 4: 
+        case 4:
+            deslinkar(headAlu);
+        	break;
+        case 5: 
             printf("Código?(ex 19051): ");
             scanf("%d", &codigo);
             removeAluno(codigo, headAlu);
             break;
-        case 5:
+        case 6:
             printf("Código?(ex 4123): ");
             scanf("%d", &codigo);
             removeDisciplina(codigo, headDis);
