@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-//teste
+
 typedef struct Aluno alu;
 typedef struct Disciplina dis;
 typedef long long ll;
