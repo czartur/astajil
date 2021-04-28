@@ -28,20 +28,39 @@ void wait(){
     fgetc(stdin);
     getchar();
 }
-
+//testes dos valores inseridos na disciplina
+int testaCodDis (int cod)
+{
+	if ((1000<=cod)&&(cod<=9999)) return 1;
+	return 0;
+}
+int testaCredDis (int cred)
+{
+	if (cred>=0) return 0;
+	return 1;
+}
 //Disciplina
 dis* novaDisciplina(){
+	int teste=0;
     dis* nova = (dis*) malloc(sizeof(dis));
     nova->next = NULL;
-    printf("Codigo? (ex: 1234): ");
-    scanf("%d", &(nova->codigo));
-    printf("Nome? (ex Matematica): ");
+    while (!teste)
+	{	
+		printf("Codigo? (ex: 1234): ");
+    	scanf("%d", &(nova->codigo));
+    	teste=testaCodDis (nova->codigo);
+	}
+	printf("Nome? (ex Matematica): ");
     scanf("%s", nova->nome);
     printf("Professor? (ex Luiz): ");
     scanf("%s", nova->professor);
-    printf("Créditos? (ex 90): ");
-    scanf("%d", &(nova->creditos));
-    return nova;
+    while (teste)
+    {
+		printf("Créditos? (ex 90): ");
+    	scanf("%d", &(nova->creditos));
+    	teste=testaCredDis(nova->creditos);
+	}
+	return nova;
 }
 void insereDisciplina(dis* nova, dis** head){
     nova->next=*head;
@@ -77,20 +96,49 @@ void verDisciplina(dis* head, alu* headAlu){
             printf("(%d) %s\n", ++cnt, p->nome);
     }
 }
+//teste dos valores inseridos nos alunos
+int testaCodAlu (int cod)
+{
+	if ((10000<=cod)&&(cod<=99999)) return 1;
+	return 0;
+}
+int testaCPFAlu (char *cpf)
+{
+	int contador=0,i=0;
+	for (i;cpf[i]!='\0';i++)
+	{
+		if (!((48<=cpf[i])&&(cpf[i]<=57))){
+		printf("\noi amor\n");
+		return 1;
+		} 
+		contador++;
+		printf("\ncontador %d\n",contador);
+	}
+	if (contador!=11) return 1;
+	return 0;
+}
+
 
 //Aluno
 alu* novoAluno(){
     alu* ans = (alu*) malloc(sizeof(alu));
     ans->next = NULL;
     ans->disciplinas = NULL;
-    
-    printf("Código (ex 19401): ");
-    scanf("%d", &(ans->codigo));
-    printf("Nome (ex Almeida): ");
+    int teste = 0;
+    while (!teste)
+    {
+	    printf("Código (ex 19401): ");
+    	scanf("%d", &(ans->codigo));
+		teste = testaCodAlu(ans->codigo);
+	}
+	printf("Nome (ex Almeida): ");
     scanf("%s", ans->nome);
-    printf("CPF (ex 09876543211): ");
-    scanf("%s", ans->cpf);
-    
+    while (teste)
+    {
+    	printf("CPF (ex 09876543211): ");
+    	scanf("%s", ans->cpf);
+		teste = testaCPFAlu(ans->cpf);
+	}
     return ans;
 }
 void insereAluno(alu* novo, alu** head){
