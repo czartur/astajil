@@ -108,11 +108,11 @@ int testaCPFAlu (char *cpf)
 	for (i;cpf[i]!='\0';i++)
 	{
 		if (!((48<=cpf[i])&&(cpf[i]<=57))){
-		printf("\noi amor\n");
+		//printf("\ncaractere invalido aqui\n");
 		return 1;
 		} 
 		contador++;
-		printf("\ncontador %d\n",contador);
+		//printf("\ncontador %d\n",contador);
 	}
 	if (contador!=11) return 1;
 	return 0;
