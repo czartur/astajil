@@ -1,9 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
+// created by: César (19006) and Almeida (19047)
+// Sinopse do código: 
+//* Criamos uma lista de alunos e uma lista de disciplinas
+//* Todos os dados são salvos e recuperados por período
+//* Para tratar os links (matrículas) colocamos, em cada aluno, a lista de disciplinas que ele está matriculado
+//* Para verificar quais alunos estão matriculados em uma disciplina passamos por cada aluno cadastrado
+//  e verificamos se a disciplina em questão está na sua lista de disciplinas matriculadas
+
 typedef struct Aluno alu;
 typedef struct Disciplina dis;
-typedef long long ll;
 
 struct Disciplina {
     int codigo;
@@ -22,13 +30,27 @@ struct Aluno {
     struct Aluno* next;
 };
 
+//wait for user input before cleaning terminal
 void wait(){
     printf("press enter to continue...");
     fflush(stdin);
     fgetc(stdin);
     getchar();
 }
-//testes dos valores inseridos na disciplina
+
+//testing user inputint testaPer(char* per){
+int testaPer(char* per){
+    int cnt=0;
+    while(per[cnt]!='\0'){
+        //printf("per[%d] = %c\n", cnt, per[cnt]);
+        if(per[cnt] == '\0') break;
+        if((cnt != 4) && (per[cnt]<'0' | per[cnt]>'9')) return 0;
+        if((cnt == 4) && per[cnt]!='.') return 0;
+        cnt++; 
+    }
+    if(cnt == 1 && per[0] == '0') return -1;
+    return cnt == 6;
+}
 int testaCodDis (int cod)
 {
 	if ((1000<=cod)&&(cod<=9999)) return 1;
@@ -39,9 +61,31 @@ int testaCredDis (int cred)
 	if (cred>=0) return 0;
 	return 1;
 }
+int testaCodAlu (int cod)
+{
+	if ((10000<=cod)&&(cod<=99999)) return 1;
+	return 0;
+}
+int testaCPFAlu (char *cpf)
+{
+	int contador=0,i=0;
+	for (i;cpf[i]!='\0';i++)
+	{
+		if (!((48<=cpf[i])&&(cpf[i]<=57))){
+		//printf("\ncaractere invalido aqui\n");
+		return 1;
+		} 
+		contador++;
+		//printf("\ncontador %d\n",contador);
+	}
+	if (contador!=11) return 1;
+	return 0;
+}
 
 
-//Disciplina
+// ##Disciplina##
+
+// handle Disciplina input
 dis* novaDisciplina(){
 	int teste=0;
     dis* nova = (dis*) malloc(sizeof(dis));
@@ -66,20 +110,24 @@ dis* novaDisciplina(){
 	}
 	return nova;
 }
+// add new Disciplina
 void insereDisciplina(dis* nova, dis** head){
     nova->next=*head;
     *head = nova;
 }
+// show all Disciplinas
 void printaDisciplinas(dis* head){
     printf("#Disciplinas\n");
     for(dis *p=head; p!=NULL; p=p->next)
         printf("%d | %s\n", p->codigo, p->nome);
 }
+// find Disciplina by code
 dis* encontraDisciplina(int codigo, dis* head){
     dis* p = head;
     while(p && p->codigo != codigo) p=p->next;
     return p;
 }
+// show everything about a specific Disciplina
 void verDisciplina(dis* head, alu* headAlu){
     int codigo;
     printf("Código?(ex 1234): ");
@@ -101,30 +149,9 @@ void verDisciplina(dis* head, alu* headAlu){
     }
 }
 
-//teste dos valores inseridos nos alunos
-int testaCodAlu (int cod)
-{
-	if ((10000<=cod)&&(cod<=99999)) return 1;
-	return 0;
-}
-int testaCPFAlu (char *cpf)
-{
-	int contador=0,i=0;
-	for (i;cpf[i]!='\0';i++)
-	{
-		if (!((48<=cpf[i])&&(cpf[i]<=57))){
-		//printf("\ncaractere invalido aqui\n");
-		return 1;
-		} 
-		contador++;
-		//printf("\ncontador %d\n",contador);
-	}
-	if (contador!=11) return 1;
-	return 0;
-}
+// ##Aluno##
 
-
-//Aluno
+// handle Aluno input
 alu* novoAluno(){
     alu* ans = (alu*) malloc(sizeof(alu));
     ans->next = NULL;
@@ -148,20 +175,24 @@ alu* novoAluno(){
 	}
     return ans;
 }
+// add new Aluno
 void insereAluno(alu* novo, alu** head){
     novo->next = *head;
     *head=novo; 
 }
+// show all Alunos
 void printaAlunos(alu* head){
     printf("#Alunos\n");
     for(alu *p=head; p!=NULL; p=p->next)
         printf("%d | %s \n", p->codigo, p->nome);
 }
+// find Aluno by code
 alu* encontraAluno(int codigo, alu* head){
     alu* p = head;
     while(p && p->codigo != codigo) p=p->next;
     return p;
 }
+// show everything about an Aluno
 void verAluno(alu* head, dis* headDis){
     int codigo;
     printf("Código?(ex 12345): ");
@@ -179,7 +210,7 @@ void verAluno(alu* head, dis* headDis){
         printf("(%d) %s\n", ++cnt, p->nome);
 }
 
-//link
+//link (add a Disciplina to an Aluno node)
 void linkar(alu** headAlu, dis** headDis){
     int codigoAlu, codigoDis;
     printf("Codigo do Aluno? (ex 12345): ");
@@ -203,7 +234,7 @@ void linkar(alu** headAlu, dis** headDis){
     insereDisciplina(nova, &(auxAlu->disciplinas));
 }
 
-//remove
+//remove&unlink functions 
 void removeDisciplina(int codigo, dis** head){
     dis *p = *head, *prev=NULL; 
     while(p && p->codigo != codigo){
@@ -245,19 +276,6 @@ void deslinkar(alu** headAlu, dis** headDis){
         return;
     }
  	removeDisciplina(codigoDis, &(auxAlu->disciplinas));
-}
-
-int testaPer(char* per){
-    int cnt=0;
-    while(per[cnt]!='\0'){
-        //printf("per[%d] = %c\n", cnt, per[cnt]);
-        if(per[cnt] == '\0') break;
-        if((cnt != 4) && (per[cnt]<'0' | per[cnt]>'9')) return 0;
-        if((cnt == 4) && per[cnt]!='.') return 0;
-        cnt++; 
-    }
-    if(cnt == 1 && per[0] == '0') return -1;
-    return cnt == 6;
 }
 
 //load & save
@@ -312,6 +330,7 @@ void saveData(FILE **ptr, char* per, alu** headAlu, dis** headDis){
     fclose(*ptr);
 }
 
+// ##Menu##
 int menuPrincipal();
 int menuCadastros(alu**, dis**);
 int menuConsultas(alu**, dis**);
