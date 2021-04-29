@@ -7,7 +7,7 @@ typedef long long ll;
 
 struct Disciplina {
     int codigo;
-    char nome[30], professor[30];
+    char nome[40], professor[30];
     int creditos;
 
     struct Disciplina* next;
@@ -48,21 +48,21 @@ dis* novaDisciplina(){
     nova->next = NULL;
     while (!teste)
 	{	
-		printf("Codigo? (ex: 1234): ");
+		printf("Codigo? (ex 1234): ");
     	scanf("%d", &(nova->codigo));
     	teste=testaCodDis (nova->codigo);
-    	if(!teste) printf("C骴igo de disciplina inv醠ido.\n");
+    	if(!teste) printf("Codigo de disciplina invalido.\n");
 	}
-	printf("Nome? (ex Matematica): ");
-    scanf(" %29[^\n]", nova->nome);
-    printf("Professor? (ex Luiz): ");
+	printf("Nome? (ex Laboratorio de Programa莽ao): ");
+    scanf(" %39[^\n]", nova->nome);
+    printf("Professor? (ex Julio Cesar): ");
     scanf(" %29[^\n]", nova->professor);
     while (teste)
     {
 		printf("Cr茅ditos? (ex 90): ");
     	scanf("%d", &(nova->creditos));
     	teste=testaCredDis(nova->creditos);
-    	if(teste) printf("Valor dos Cr閐itos inv醠ido.\n");
+    	if(teste) printf("Valor dos creditos invalido.\n");
 	}
 	return nova;
 }
@@ -82,7 +82,7 @@ dis* encontraDisciplina(int codigo, dis* head){
 }
 void verDisciplina(dis* head, alu* headAlu){
     int codigo;
-    printf("C贸digo?(ex 1432): ");
+    printf("C贸digo?(ex 1234): ");
     scanf("%d", &codigo);
     dis* aux = encontraDisciplina(codigo, head);
     if(aux == NULL){
@@ -132,19 +132,19 @@ alu* novoAluno(){
     int teste = 0;
     while (!teste)
     {
-	    printf("C贸digo (ex 19401): ");
+	    printf("C贸digo (ex 12345): ");
     	scanf("%d", &(ans->codigo));
 		teste = testaCodAlu(ans->codigo);
-		if(!teste) printf("C骴igo do aluno inv醠ido.\n");
+		if(!teste) printf("Codigo do aluno invalido.\n");
 	}
-	printf("Nome (ex Almeida): ");
+	printf("Nome (ex Fulano de Tal): ");
     scanf(" %29[^\n]", ans->nome);
     while (teste)
     {
     	printf("CPF (ex 09876543211): ");
     	scanf("%s", ans->cpf);
 		teste = testaCPFAlu(ans->cpf);
-		if (teste)printf("CPF inv醠ido.\n");
+		if (teste)printf("CPF invalido.\n");
 	}
     return ans;
 }
@@ -164,7 +164,7 @@ alu* encontraAluno(int codigo, alu* head){
 }
 void verAluno(alu* head, dis* headDis){
     int codigo;
-    printf("C贸digo?(ex 19004): ");
+    printf("C贸digo?(ex 12345): ");
     scanf("%d", &codigo);
     alu* aux = encontraAluno(codigo, head);
     if(aux == NULL) {
@@ -182,7 +182,7 @@ void verAluno(alu* head, dis* headDis){
 //link
 void linkar(alu** headAlu, dis** headDis){
     int codigoAlu, codigoDis;
-    printf("Codigo do Aluno? (ex 19006): ");
+    printf("Codigo do Aluno? (ex 12345): ");
     scanf("%d", &codigoAlu);
     alu* auxAlu = encontraAluno(codigoAlu, *headAlu);
     if(auxAlu == NULL){
@@ -190,7 +190,7 @@ void linkar(alu** headAlu, dis** headDis){
         return; 
     }
     
-    printf("Codigo da Disciplina? (ex 4321): ");
+    printf("Codigo da Disciplina? (ex 1234): ");
     scanf("%d", &codigoDis);
     dis* auxDis = encontraDisciplina(codigoDis, *headDis);
     if(auxDis == NULL){ 
@@ -203,7 +203,7 @@ void linkar(alu** headAlu, dis** headDis){
     insereDisciplina(nova, &(auxAlu->disciplinas));
 }
 
-//remove#
+//remove
 void removeDisciplina(int codigo, dis** head){
     dis *p = *head, *prev=NULL; 
     while(p && p->codigo != codigo){
@@ -222,19 +222,26 @@ void removeAluno(int codigo, alu** head){
     if(p == NULL) return;
     (prev == NULL) ? *head=p->next : prev->next=p->next;
 }
-void deslinkar(alu** headAlu){
+void deslinkar(alu** headAlu, dis** headDis){
 	int codigoAlu, codigoDis;
-    printf("Codigo do Aluno? (ex 19086): ");
+    printf("Codigo do Aluno? (ex 12345): ");
     scanf("%d", &codigoAlu);
     alu* auxAlu = encontraAluno(codigoAlu, *headAlu);
     if(auxAlu == NULL){
-        printf("Aluno n茫o encontrado!\n");
+        printf("Aluno nao encontrado!\n");
+        wait();
         return; 
     }
-    printf("Codigo da Disciplina? (ex 4321): ");
-    scanf("%d", &codigoDis);//falta testar a disciplina
+    printf("Codigo da Disciplina? (ex 1234): ");
+    scanf("%d", &codigoDis);//falta testar a disciplina 
+    if(!(encontraDisciplina(codigoDis, *headDis))){
+        printf("Disciplina nao encontrada!\n");
+        wait();
+        return;
+    }
     if (!(encontraDisciplina(codigoDis,auxAlu->disciplinas))) {
         printf("Disciplina nao relacionada ao aluno!\n");
+        wait();
         return;
     }
  	removeDisciplina(codigoDis, &(auxAlu->disciplinas));
@@ -249,7 +256,7 @@ int testaPer(char* per){
         if((cnt == 4) && per[cnt]!='.') return 0;
         cnt++; 
     }
-    if(cnt == 0 && per[0] == '0') return -1;
+    if(cnt == 1 && per[0] == '0') return -1;
     return cnt == 6;
 }
 
@@ -381,7 +388,7 @@ int menuCadastros(alu **headAlu, dis **headDis){
             linkar(headAlu, headDis);
             break;
         case 4:
-            deslinkar(headAlu);
+            deslinkar(headAlu, headDis);
         	break;
         case 5: 
             printf("C贸digo?(ex 19051): ");
