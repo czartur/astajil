@@ -141,7 +141,7 @@ alu* novoAluno(){
     	printf("CPF (ex 09876543211): ");
     	scanf("%s", ans->cpf);
 		teste = testaCPFAlu(ans->cpf);
-		if (teste)printf("CPF invalido.\n");
+		if (teste)printf("CPF inválido.\n");
 	}
     return ans;
 }
