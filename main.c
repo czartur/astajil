@@ -49,6 +49,7 @@ dis* novaDisciplina(){
 		printf("Codigo? (ex: 1234): ");
     	scanf("%d", &(nova->codigo));
     	teste=testaCodDis (nova->codigo);
+    	if(!teste) printf("Código de disciplina inválido.\n");
 	}
 	printf("Nome? (ex Matematica): ");
     scanf("%s", nova->nome);
@@ -59,6 +60,7 @@ dis* novaDisciplina(){
 		printf("CrÃ©ditos? (ex 90): ");
     	scanf("%d", &(nova->creditos));
     	teste=testaCredDis(nova->creditos);
+    	if(teste) printf("Valor dos Créditos inválido.\n");
 	}
 	return nova;
 }
@@ -130,6 +132,7 @@ alu* novoAluno(){
 	    printf("CÃ³digo (ex 19401): ");
     	scanf("%d", &(ans->codigo));
 		teste = testaCodAlu(ans->codigo);
+		if(!teste) printf("Código do aluno inválido.\n");
 	}
 	printf("Nome (ex Almeida): ");
     scanf("%s", ans->nome);
@@ -138,6 +141,7 @@ alu* novoAluno(){
     	printf("CPF (ex 09876543211): ");
     	scanf("%s", ans->cpf);
 		teste = testaCPFAlu(ans->cpf);
+		if (teste)printf("CPF invalido.\n");
 	}
     return ans;
 }
