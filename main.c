@@ -278,6 +278,20 @@ void deslinkar(alu** headAlu, dis** headDis){
  	removeDisciplina(codigoDis, &(auxAlu->disciplinas));
 }
 
+
+void readNomeComposto(FILE **ptr, char *nome, int lim){
+    int cnt=0; 
+    while(true){
+        char c = fgetc(*ptr);
+        if(c == '\n') break;
+        nome[cnt++]=c;
+        if(cnt == lim) {
+            while(fgetc(*ptr)!='\n');
+            break;
+        }
+    }
+    nome[cnt] = '\0';
+}
 //load & save
 void loadData(FILE **ptr, char* per, alu** headAlu, dis** headDis){
     *ptr = fopen(per, "r");
@@ -287,7 +301,11 @@ void loadData(FILE **ptr, char* per, alu** headAlu, dis** headDis){
         if(tipo == 'D'){
             dis* nova = (dis*) malloc(sizeof(dis));
             nova->next = NULL;
-            fscanf(*ptr, "%d %s %s %d", &(nova->codigo), nova->nome, nova->professor, &(nova->creditos));
+            fscanf(*ptr, "%d", &(nova->codigo));
+            fgetc(*ptr);
+            readNomeComposto(ptr, nova->nome, 39);
+            readNomeComposto(ptr, nova->professor, 29);
+            fscanf(*ptr, "%d", &(nova->creditos));
             //printf("\n%d\n%s\n%s\n%d\n\n", nova->codigo, nova->nome, nova->professor, nova->creditos);
             insereDisciplina(nova, headDis);
         }
@@ -295,7 +313,10 @@ void loadData(FILE **ptr, char* per, alu** headAlu, dis** headDis){
             alu* novo = (alu*) malloc(sizeof(alu));
             novo->next = NULL;
             novo->disciplinas = NULL;
-            fscanf(*ptr, "%d %s %s", &(novo->codigo), novo->nome, novo->cpf);
+            fscanf(*ptr, "%d", &(novo->codigo));
+            fgetc(*ptr);
+            readNomeComposto(ptr, novo->nome, 29);
+            fscanf(*ptr, "%s", novo->cpf);
             //printf("\n%d\n%s\n%s\n", novo->codigo, novo->nome, novo->cpf);
             int codigoDis; 
             while(fscanf(*ptr, "%d", &codigoDis)){
