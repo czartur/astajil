@@ -38,7 +38,7 @@ void wait(){
     getchar();
 }
 
-//testing user inputint testaPer(char* per){
+//testing user input
 int testaPer(char* per){
     int cnt=0;
     while(per[cnt]!='\0'){
@@ -234,7 +234,7 @@ void linkar(alu** headAlu, dis** headDis){
     insereDisciplina(nova, &(auxAlu->disciplinas));
 }
 
-//remove&unlink functions 
+//remove and unlink functions 
 void removeDisciplina(int codigo, dis** head){
     dis *p = *head, *prev=NULL; 
     while(p && p->codigo != codigo){
@@ -278,7 +278,7 @@ void deslinkar(alu** headAlu, dis** headDis){
  	removeDisciplina(codigoDis, &(auxAlu->disciplinas));
 }
 
-
+//function that reads multiple words per line up to a limit from FILE
 void readNomeComposto(FILE **ptr, char *nome, int lim){
     int cnt=0; 
     while(true){
@@ -292,7 +292,7 @@ void readNomeComposto(FILE **ptr, char *nome, int lim){
     }
     nome[cnt] = '\0';
 }
-//load & save
+//load and save data
 void loadData(FILE **ptr, char* per, alu** headAlu, dis** headDis){
     *ptr = fopen(per, "r");
     if(*ptr == NULL) return;
