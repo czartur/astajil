@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 
-// created by: César (19006) and Almeida (19047)
+// Created by: César (19006) and Almeida (19047)
 // Sinopse do código: 
 //* Criamos uma lista de alunos e uma lista de disciplinas
 //* Todos os dados são salvos e recuperados por período
