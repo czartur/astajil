@@ -7,7 +7,7 @@ typedef long long ll;
 
 struct Disciplina {
     int codigo;
-    char nome[20], professor[20];
+    char nome[30], professor[30];
     int creditos;
 
     struct Disciplina* next;
@@ -15,7 +15,7 @@ struct Disciplina {
 
 struct Aluno {
     int codigo;
-    char nome[20], cpf[20];
+    char nome[30], cpf[15];
     
     struct Disciplina* disciplinas;  
 
@@ -39,6 +39,8 @@ int testaCredDis (int cred)
 	if (cred>=0) return 0;
 	return 1;
 }
+
+
 //Disciplina
 dis* novaDisciplina(){
 	int teste=0;
@@ -51,9 +53,9 @@ dis* novaDisciplina(){
     	teste=testaCodDis (nova->codigo);
 	}
 	printf("Nome? (ex Matematica): ");
-    scanf("%s", nova->nome);
+    scanf(" %29[^\n]", nova->nome);
     printf("Professor? (ex Luiz): ");
-    scanf("%s", nova->professor);
+    scanf(" %29[^\n]", nova->professor);
     while (teste)
     {
 		printf("Créditos? (ex 90): ");
@@ -96,6 +98,7 @@ void verDisciplina(dis* head, alu* headAlu){
             printf("(%d) %s\n", ++cnt, p->nome);
     }
 }
+
 //teste dos valores inseridos nos alunos
 int testaCodAlu (int cod)
 {
@@ -132,7 +135,7 @@ alu* novoAluno(){
 		teste = testaCodAlu(ans->codigo);
 	}
 	printf("Nome (ex Almeida): ");
-    scanf("%s", ans->nome);
+    scanf(" %29[^\n]", ans->nome);
     while (teste)
     {
     	printf("CPF (ex 09876543211): ");
@@ -196,7 +199,7 @@ void linkar(alu** headAlu, dis** headDis){
     insereDisciplina(nova, &(auxAlu->disciplinas));
 }
 
-//remove
+//remove#
 void removeDisciplina(int codigo, dis** head){
     dis *p = *head, *prev=NULL; 
     while(p && p->codigo != codigo){
@@ -233,19 +236,22 @@ void deslinkar(alu** headAlu){
  	removeDisciplina(codigoDis, &(auxAlu->disciplinas));
 }
 
-char* perString(float per){
-    char *ans = (char*) malloc(7*sizeof(char));
-    int eval = (int)10*per;
-    ans[5]=eval%10 + '0'; eval/=10;
-    ans[4]='.';
-    for(int i=3; i>=0; i--) {ans[i] = eval%10 + '0'; eval/=10;}
-    ans[6]='\0';
-    return ans;
+int testaPer(char* per){
+    int cnt=0;
+    while(per[cnt]!='\0'){
+        //printf("per[%d] = %c\n", cnt, per[cnt]);
+        if(per[cnt] == '\0') break;
+        if((cnt != 4) && (per[cnt]<'0' | per[cnt]>'9')) return 0;
+        if((cnt == 4) && per[cnt]!='.') return 0;
+        cnt++; 
+    }
+    if(cnt == 0 && per[0] == '0') return -1;
+    return cnt == 6;
 }
 
 //load & save
-void loadData(FILE **ptr, float per, alu** headAlu, dis** headDis){
-    *ptr = fopen(perString(per), "r");
+void loadData(FILE **ptr, char* per, alu** headAlu, dis** headDis){
+    *ptr = fopen(per, "r");
     if(*ptr == NULL) return;
     char tipo;
     while(fscanf(*ptr, " %c", &tipo) != EOF){
@@ -278,8 +284,8 @@ void loadData(FILE **ptr, float per, alu** headAlu, dis** headDis){
     //wait();
     fclose(*ptr);
 }
-void saveData(FILE **ptr, float per, alu** headAlu, dis** headDis){
-    *ptr = fopen(perString(per), "w+");
+void saveData(FILE **ptr, char* per, alu** headAlu, dis** headDis){
+    *ptr = fopen(per, "w+");
     for(dis* p = *headDis; p!=NULL; p=p->next){
         fprintf(*ptr, "D\n%d\n%s\n%s\n%d\n\n", p->codigo, p->nome, p->professor, p->creditos);
     }
@@ -307,10 +313,14 @@ int main(){
         int level=0;
         system("clear");
         printf("Carregar Período (ex 2021.1)\n[0] para sair\n");
-        float per;
-        scanf("%f", &per);
-        if(per==0) break;
-        
+        char per[20];
+        scanf("%s", per);
+        if(testaPer(per) == -1) break;
+        if(testaPer(per) == 0) {
+            printf("Periodo invalido!\n");
+            wait();
+            continue;
+        }
         loadData(&ptr, per, &headAlu, &headDis);
 
         level++;
